@@ -8,15 +8,11 @@
     <meta name="apple-mobile-web-app-title" content="Naomi">
     
     <title>Чат с Naomi</title>
-    <!-- Подключение Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Подключение шрифтов Montserrat и JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <!-- Иконки Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Стили и скрипт для подсветки кода Prism.js -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
@@ -83,10 +79,10 @@
         }
 
         #settings-screen {
-             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
         #chat-container {
-             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
         
         #preloader {
@@ -117,23 +113,21 @@
         </div>
     </div>
 
-    <!-- Модальное окно для изображений -->
     <div id="fullscreen-modal" class="fixed inset-0 bg-black/80 z-50 hidden justify-center items-center p-4">
         <img id="fullscreen-image" class="max-w-full max-h-full object-contain">
         <button id="modal-close" class="absolute top-5 right-5 text-white text-5xl font-bold">&times;</button>
     </div>
 
-    <!-- ЧАТ-ОКНО -->
     <div id="chat-container" class="w-full max-w-2xl h-[90vh] md:h-[85vh] flex flex-col liquid-glass rounded-2xl opacity-0">
         <header class="flex-shrink-0 flex items-center justify-center p-4 border-b border-white/10 relative">
-             <button id="settings-open-btn" class="flex items-center gap-2 group">
-                 <h2 class="text-2xl naomi-font transition-colors group-hover:text-sky-300">Naomi</h2>
-             </button>
+            <button id="settings-open-btn" class="flex items-center gap-2 group">
+                <h2 class="text-2xl naomi-font transition-colors group-hover:text-sky-300">Naomi</h2>
+            </button>
         </header>
         <div id="chat-messages" class="flex-grow overflow-y-auto p-4 space-y-4 flex flex-col">
-             <div id="welcome-message" class="text-center p-8 m-auto">
+            <div id="welcome-message" class="text-center p-8 m-auto">
                 <h3 class="text-2xl font-bold glowing-text">Чем могу помочь?</h3>
-             </div>
+            </div>
         </div>
         <footer class="flex-shrink-0 p-2">
             <div id="image-preview-container" class="px-2 pb-2"></div>
@@ -153,7 +147,6 @@
         </footer>
     </div>
     
-    <!-- ЭКРАН НАСТРОЕК -->
     <div id="settings-screen" class="w-11/12 max-w-lg p-6 liquid-glass rounded-2xl hidden">
         <header class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold">Настройки</h2>
@@ -162,10 +155,10 @@
         <div class="space-y-4">
             <h3 class="font-semibold">Фон чата</h3>
             <div class="flex items-center gap-2">
-                 <input id="bg-url-input" type="text" class="form-input liquid-glass bg-transparent w-full p-2 rounded-lg outline-none border-transparent focus:border-sky-500" placeholder="Вставьте ссылку на изображение...">
-                 <button id="apply-bg-btn" class="liquid-glass px-4 py-2 rounded-full font-semibold hover:bg-slate-700/50">Применить</button>
+                <input id="bg-url-input" type="text" class="form-input liquid-glass bg-transparent w-full p-2 rounded-lg outline-none border-transparent focus:border-sky-500" placeholder="Вставьте ссылку на изображение...">
+                <button id="apply-bg-btn" class="liquid-glass px-4 py-2 rounded-full font-semibold hover:bg-slate-700/50">Применить</button>
             </div>
-             <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4">
                 <label for="upload-bg-input" class="liquid-glass bg-[rgba(30,41,59,0.25)] w-full text-center py-2 rounded-full font-semibold hover:bg-slate-700/50 cursor-pointer">Загрузить фото</label>
                 <input type="file" id="upload-bg-input" class="hidden" accept="image/*">
                 <button id="restore-bg-btn" class="liquid-glass w-full py-2 rounded-full font-semibold hover:bg-slate-700/50">По умолчанию</button>
@@ -227,7 +220,7 @@
             });
 
             uploadBgInput.addEventListener('change', (e) => {
-                 const file = e.target.files[0];
+                const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
@@ -256,7 +249,9 @@
             const modalImage = document.getElementById('fullscreen-image');
             const modalClose = document.getElementById('modal-close');
 
-            const GEMINI_API_KEY = "AIzaSyAfukPDZRpxp3Ayds6gmd2mz5tc7qkmNxA"; 
+            // ВАЖНО: Никогда не вставляйте API-ключ прямо в код на стороне клиента.
+            // В этой среде он будет подставлен автоматически и безопасно.
+            const GEMINI_API_KEY = ""; 
             const systemInstructionText = "Твое имя - Naomi. Ты — дружелюбный и эмпатичный AI-собеседник. Твоя цель - честно и открыто общаться с пользователем, помогая ему со всем необходимым. Ты можешь анализировать изображения, которые присылает пользователь, и давать по ним советы или просто обсуждать их. Не упоминай, что ты языковая модель или AI от Google. Ты была создана разработчиком по имени Lolli (его телеграм @lollitune). Ты можешь упоминать его, если это будет уместно. Также ты можешь писать код на разных языках программирования. Когда пишешь код, всегда указывай язык после тройных кавычек, например: ```javascript.";
             
             let chatHistory = [];
@@ -275,7 +270,7 @@
                             uploadedImageData = null;
                             imagePreviewContainer.innerHTML = '';
                             imageUploadInput.value = '';
-                             chatInput.dispatchEvent(new Event('input'));
+                            chatInput.dispatchEvent(new Event('input'));
                         });
                         chatInput.dispatchEvent(new Event('input'));
                     };
@@ -374,36 +369,37 @@
                         const newRadius = Math.max(minRadius, maxRadius - (height - singleLineHeight) * 0.15);
                         messageBubble.style.borderRadius = `${newRadius}px`;
                     });
-                 } else {
-                     messageBubble.classList.add('rounded-2xl');
-                 }
+                } else {
+                    messageBubble.classList.add('rounded-2xl');
+                }
 
 
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 return messageBubble;
             }
 
-             function openModal(src) {
+            function openModal(src) {
                 modalImage.src = src;
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             }
             
             modalClose.addEventListener('click', () => {
-                 modal.classList.add('hidden');
-                 modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             });
 
             async function getGeminiResponse() {
-                if (!GEMINI_API_KEY) {
-                    appendMessage({content: "Ошибка: API ключ не предоставлен."}, "model");
-                    return;
-                }
+                // Поскольку ключ теперь пустой, мы должны использовать прокси или специальную конечную точку,
+                // предоставляемую средой. Для простоты здесь предполагается, что среда
+                // перехватывает этот fetch и вставляет ключ.
+                // Если бы это было реальное приложение, здесь был бы вызов к вашему бэкенду,
+                // который уже безопасно хранит ключ и делает запрос к API Google.
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`;
+                
                 const modelBubble = appendMessage({ content: ''}, 'model');
                 modelBubble.innerHTML = '<div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse"></div>';
                 try {
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`;
-                    
                     const payload = {
                         "contents": [...chatHistory],
                         "systemInstruction": { "parts": [{ "text": systemInstructionText }] }
@@ -439,30 +435,30 @@
                     if (fullResponse) {
                         const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
                         if (codeBlockRegex.test(fullResponse)) {
-                             modelBubble.remove();
-                             const parts = fullResponse.split(codeBlockRegex);
-                             for(let i = 0; i < parts.length; i++){
-                                 if(!parts[i] || !parts[i].trim()) continue;
-                                 
-                                 if (i > 0 && (i-1) % 3 === 0) {
-                                      appendMessage({
-                                         type: 'code',
-                                         language: parts[i-1] || 'markup',
-                                         code: parts[i+1].trim()
-                                     }, 'model');
-                                     i++;
-                                 } else {
-                                     const textBubble = appendMessage({ content: '' }, 'model');
-                                     parseAndAppend(parts[i].trim(), textBubble);
-                                 }
-                             }
+                            modelBubble.remove();
+                            const parts = fullResponse.split(codeBlockRegex);
+                            for(let i = 0; i < parts.length; i++){
+                                if(!parts[i] || !parts[i].trim()) continue;
+                                
+                                if (i > 0 && (i-1) % 3 === 0) {
+                                    appendMessage({
+                                        type: 'code',
+                                        language: parts[i-1] || 'markup',
+                                        code: parts[i+1].trim()
+                                    }, 'model');
+                                    i++;
+                                } else {
+                                    const textBubble = appendMessage({ content: '' }, 'model');
+                                    parseAndAppend(parts[i].trim(), textBubble);
+                                }
+                            }
                         } else {
-                             parseAndAppend(fullResponse, modelBubble);
+                            parseAndAppend(fullResponse, modelBubble);
                         }
                         
                         chatHistory.push({ role: 'model', parts: [{ text: fullResponse }] });
                     } else {
-                         modelBubble.textContent = "Не удалось получить ответ.";
+                        modelBubble.textContent = "Не удалось получить ответ.";
                     }
                 } catch (error) {
                     modelBubble.textContent = "Произошла ошибка. Проверьте API-ключ или попробуйте снова.";
