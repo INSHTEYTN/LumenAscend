@@ -66,8 +66,8 @@
         }
         
         .code-block, pre[class*="language-"], code[class*="language-"] { font-family: 'JetBrains Mono', monospace; }
-        /* Removed padding from .code-block to avoid double padding */
         .code-block { background-color: transparent !important; }
+        
         pre[class*="language-"] {
             margin: 0;
             padding: 1rem !important;
@@ -77,7 +77,14 @@
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(5px) !important;
             -webkit-backdrop-filter: blur(5px) !important;
+            overflow-x: auto; 
+            scrollbar-width: none;
+            -ms-overflow-style: none; 
         }
+        pre[class*="language-"]::-webkit-scrollbar {
+            display: none;
+        }
+
 
         #settings-screen {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -194,8 +201,6 @@
             
             // --- Constants and State ---
             const defaultBg = "url('https://i.pinimg.com/736x/95/8d/34/958d341ff94a4952f67b6fcd01d579ff.jpg')";
-            // IMPORTANT: Never paste an API key directly into client-side code.
-            // In this environment, it will be substituted automatically and securely.
             const GEMINI_API_KEY = ""; 
             const systemInstructionText = "Твое имя - Naomi. Ты — дружелюбный и эмпатичный AI-собеседник. Твоя цель - честно и открыто общаться с пользователем, помогая ему со всем необходимым. Ты можешь анализировать изображения, которые присылает пользователь, и давать по ним советы или просто обсуждать их. Не упоминай, что ты языковая модель или AI от Google. Ты была создана разработчиком по имени Lolli (его телеграм @lollitune). Ты можешь упоминать его, если это будет уместно. Также ты можешь писать код на разных языках программирования. Когда пишешь код, всегда указывай язык после тройных кавычек, например: ```javascript.";
             
@@ -309,14 +314,12 @@
                     isFirstMessage = false;
                 }
                 const userParts = [];
-                // First, display the image if it exists
                 if (uploadedImageData) {
                     const imageUrl = `data:image/jpeg;base64,${uploadedImageData}`;
                     appendMessage({ type: 'image', src: imageUrl }, 'user');
                     userParts.push({ inlineData: { mimeType: 'image/jpeg', data: uploadedImageData } });
-                    uploadedImageData = null; // Clear after adding
+                    uploadedImageData = null;
                 }
-                // Then, display the text message
                 if (message) {
                     appendMessage({ type: 'text', content: message }, 'user');
                     userParts.push({ text: message });
@@ -330,26 +333,21 @@
                 chatInput.dispatchEvent(new Event('input'));
             }
 
-            // Function to correctly parse and display text and code blocks
             function processAndDisplayModelResponse(fullResponse) {
                 const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
                 let lastIndex = 0;
                 let match;
 
-                // Remove the initial "thinking" bubble
                 const thinkingBubble = document.querySelector('.thinking');
                 if (thinkingBubble) thinkingBubble.parentElement.remove();
 
-                // Find all code blocks and process text in between
                 while ((match = codeBlockRegex.exec(fullResponse)) !== null) {
-                    // 1. Append text before the code block
                     const textBefore = fullResponse.substring(lastIndex, match.index).trim();
                     if (textBefore) {
                         const textBubble = appendMessage({ type: 'text', content: '' }, 'model');
                         parseAndFormatText(textBefore, textBubble);
                     }
 
-                    // 2. Append the code block
                     const language = match[1] || 'markup';
                     const code = match[2].trim();
                     appendMessage({ type: 'code', language, code }, 'model');
@@ -357,7 +355,6 @@
                     lastIndex = match.index + match[0].length;
                 }
 
-                // 3. Append any remaining text after the last code block
                 const remainingText = fullResponse.substring(lastIndex).trim();
                 if (remainingText) {
                     const textBubble = appendMessage({ type: 'text', content: '' }, 'model');
@@ -365,9 +362,7 @@
                 }
             }
             
-            // Formats bold text and applies it to a bubble
             function parseAndFormatText(text, bubble) {
-                 // Use a more specific regex to avoid issues with multiple asterisks
                 const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 bubble.innerHTML = formattedText;
             }
@@ -386,15 +381,53 @@
                     messageBubble.addEventListener('click', () => openModal(content.src));
                 } else if (content.type === 'code') {
                     messageBubble = document.createElement('div');
-                    messageBubble.className = `w-full max-w-full overflow-hidden model-bubble code-block`;
+                    messageBubble.className = `w-full max-w-full model-bubble code-block relative`;
+                    
                     const pre = document.createElement('pre');
                     pre.className = 'language-' + content.language;
                     const code = document.createElement('code');
                     code.textContent = content.code;
                     pre.appendChild(code);
+
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = "absolute top-2 right-2 p-1.5 rounded-md text-slate-300 hover:text-white";
+                    copyBtn.innerHTML = '<i class="ph ph-copy text-lg"></i>';
+                    copyBtn.title = "Копировать код";
+
+                    copyBtn.addEventListener('click', () => {
+                        const textArea = document.createElement('textarea');
+                        textArea.value = content.code;
+                        textArea.style.position = 'fixed';
+                        textArea.style.top = '0';
+                        textArea.style.left = '0';
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            copyBtn.innerHTML = '<i class="ph ph-check-circle text-lg text-green-400"></i>';
+                            copyBtn.title = "Скопировано!";
+                        } catch (err) {
+                            copyBtn.title = "Ошибка при копировании";
+                            console.error('Fallback: Oops, unable to copy', err);
+                        }
+                        document.body.removeChild(textArea);
+
+                        setTimeout(() => {
+                           copyBtn.innerHTML = '<i class="ph ph-copy text-lg"></i>';
+                           copyBtn.title = "Копировать код";
+                        }, 2000);
+                    });
+
                     messageBubble.appendChild(pre);
-                    // Use a small timeout to ensure the element is in the DOM before highlighting
-                    setTimeout(() => Prism.highlightAllUnder(messageBubble), 0);
+                    messageBubble.appendChild(copyBtn);
+                    
+                    // Using Prism.highlightElement for more robust highlighting, especially on mobile.
+                    // The timeout ensures the element is in the DOM before Prism runs.
+                    setTimeout(() => {
+                        Prism.highlightElement(code);
+                    }, 0);
+
                 } else {
                     messageBubble = document.createElement('div');
                     messageBubble.className = `message-bubble p-3 rounded-2xl ${sender === 'user' ? 'user-bubble' : 'model-bubble'}`;
@@ -406,22 +439,16 @@
                 messageWrapper.appendChild(messageBubble);
                 chatMessages.appendChild(messageWrapper);
                 
-                // --- Dynamic border radius adjustment ---
                 if (content.type !== 'image' && content.type !== 'code') {
-                     // We need to yield to the main thread for the browser to calculate the height
                     requestAnimationFrame(() => {
                         const height = messageBubble.offsetHeight;
-                        // Approximate height of a single line message with padding
                         const singleLineHeight = 40; 
-                        const maxRadius = 24; // px
-                        const minRadius = 16; // px
-                        
-                        // Decrease radius as the bubble gets taller
+                        const maxRadius = 24; 
+                        const minRadius = 16;
                         const newRadius = Math.max(minRadius, maxRadius - (height - singleLineHeight) * 0.15);
                         messageBubble.style.borderRadius = `${newRadius}px`;
                     });
-                } else {
-                    // For non-text content, keep the standard radius
+                } else if (content.type !== 'code') {
                     messageBubble.classList.add('rounded-2xl');
                 }
 
@@ -440,20 +467,17 @@
                 modal.classList.remove('flex');
             });
 
-            // --- Gemini API Call ---
             async function getGeminiResponse() {
-                // Use the non-streaming API for simplicity and robustness
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
                 
-                // Show a thinking indicator
                 const modelBubble = appendMessage({ content: ''}, 'model');
-                modelBubble.classList.add('thinking'); // Add a class to find and remove it later
+                modelBubble.classList.add('thinking');
                 modelBubble.innerHTML = '<div class="flex items-center gap-2 p-2"><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse"></div><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse delay-75"></div><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse delay-150"></div></div>';
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
                 try {
                     const payload = {
-                        "contents": chatHistory, // Send the whole history
+                        "contents": chatHistory,
                         "systemInstruction": { "parts": [{ "text": systemInstructionText }] }
                     };
                     
@@ -472,10 +496,8 @@
                     if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
                         const fullResponseText = result.candidates[0].content.parts[0].text;
                         
-                        // Process and display the potentially mixed content
                         processAndDisplayModelResponse(fullResponseText);
                         
-                        // Add the model's response to the history for context in future requests
                         chatHistory.push({ role: 'model', parts: [{ text: fullResponseText }] });
                     } else {
                         throw new Error("Invalid response structure from API.");
