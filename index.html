@@ -66,7 +66,8 @@
         }
         
         .code-block, pre[class*="language-"], code[class*="language-"] { font-family: 'JetBrains Mono', monospace; }
-        .code-block { padding: 0 !important; background-color: transparent !important; }
+        /* Removed padding from .code-block to avoid double padding */
+        .code-block { background-color: transparent !important; }
         pre[class*="language-"] {
             margin: 0;
             padding: 1rem !important;
@@ -169,6 +170,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
             const chatContainer = document.getElementById('chat-container');
             const settingsScreen = document.getElementById('settings-screen');
             const preloader = document.getElementById('preloader');
@@ -179,9 +181,29 @@
             const applyBgBtn = document.getElementById('apply-bg-btn');
             const uploadBgInput = document.getElementById('upload-bg-input');
             const restoreBgBtn = document.getElementById('restore-bg-btn');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const chatMessages = document.getElementById('chat-messages');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const imageUploadInput = document.getElementById('image-upload');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const modal = document.getElementById('fullscreen-modal');
+            const modalImage = document.getElementById('fullscreen-image');
+            const modalClose = document.getElementById('modal-close');
+            
+            // --- Constants and State ---
             const defaultBg = "url('https://i.pinimg.com/736x/95/8d/34/958d341ff94a4952f67b6fcd01d579ff.jpg')";
+            // IMPORTANT: Never paste an API key directly into client-side code.
+            // In this environment, it will be substituted automatically and securely.
+            const GEMINI_API_KEY = ""; 
+            const systemInstructionText = "Твое имя - Naomi. Ты — дружелюбный и эмпатичный AI-собеседник. Твоя цель - честно и открыто общаться с пользователем, помогая ему со всем необходимым. Ты можешь анализировать изображения, которые присылает пользователь, и давать по ним советы или просто обсуждать их. Не упоминай, что ты языковая модель или AI от Google. Ты была создана разработчиком по имени Lolli (его телеграм @lollitune). Ты можешь упоминать его, если это будет уместно. Также ты можешь писать код на разных языках программирования. Когда пишешь код, всегда указывай язык после тройных кавычек, например: ```javascript.";
+            
+            let chatHistory = [];
+            let isFirstMessage = true;
+            let uploadedImageData = null;
 
-            // --- Логика загрузчика ---
+            // --- Loader Logic ---
             setTimeout(() => {
                 if (loaderBar) loaderBar.style.width = '100%';
             }, 100);
@@ -194,7 +216,7 @@
             }, 1500);
 
 
-            // --- Логика настроек ---
+            // --- Settings Logic ---
             function showSettings(show) {
                 settingsScreen.classList.toggle('hidden', !show);
                 chatContainer.classList.toggle('hidden', show);
@@ -237,27 +259,7 @@
                 setBackground(savedBg);
             }
             
-            // --- Логика чата ---
-            const chatForm = document.getElementById('chat-form');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-            const chatMessages = document.getElementById('chat-messages');
-            const welcomeMessage = document.getElementById('welcome-message');
-            const imageUploadInput = document.getElementById('image-upload');
-            const imagePreviewContainer = document.getElementById('image-preview-container');
-            const modal = document.getElementById('fullscreen-modal');
-            const modalImage = document.getElementById('fullscreen-image');
-            const modalClose = document.getElementById('modal-close');
-
-            // ВАЖНО: Никогда не вставляйте API-ключ прямо в код на стороне клиента.
-            // В этой среде он будет подставлен автоматически и безопасно.
-            const GEMINI_API_KEY = ""; 
-            const systemInstructionText = "Твое имя - Naomi. Ты — дружелюбный и эмпатичный AI-собеседник. Твоя цель - честно и открыто общаться с пользователем, помогая ему со всем необходимым. Ты можешь анализировать изображения, которые присылает пользователь, и давать по ним советы или просто обсуждать их. Не упоминай, что ты языковая модель или AI от Google. Ты была создана разработчиком по имени Lolli (его телеграм @lollitune). Ты можешь упоминать его, если это будет уместно. Также ты можешь писать код на разных языках программирования. Когда пишешь код, всегда указывай язык после тройных кавычек, например: ```javascript.";
-            
-            let chatHistory = [];
-            let isFirstMessage = true;
-            let uploadedImageData = null;
-
+            // --- Chat Logic ---
             imageUploadInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -297,6 +299,7 @@
                 if (userMessage || uploadedImageData) {
                     handleUserMessage(userMessage);
                     imagePreviewContainer.innerHTML = '';
+                    imageUploadInput.value = ''; // Clear file input
                 }
             });
             
@@ -306,14 +309,17 @@
                     isFirstMessage = false;
                 }
                 const userParts = [];
-                if (message) userParts.push({ text: message });
+                // First, display the image if it exists
                 if (uploadedImageData) {
+                    const imageUrl = `data:image/jpeg;base64,${uploadedImageData}`;
+                    appendMessage({ type: 'image', src: imageUrl }, 'user');
                     userParts.push({ inlineData: { mimeType: 'image/jpeg', data: uploadedImageData } });
-                    appendMessage({ type: 'image', src: `data:image/jpeg;base64,${uploadedImageData}` }, 'user');
-                    uploadedImageData = null;
+                    uploadedImageData = null; // Clear after adding
                 }
+                // Then, display the text message
                 if (message) {
                     appendMessage({ type: 'text', content: message }, 'user');
+                    userParts.push({ text: message });
                 }
                 
                 if (userParts.length > 0) {
@@ -324,10 +330,48 @@
                 chatInput.dispatchEvent(new Event('input'));
             }
 
-            function parseAndAppend(fullResponse, modelBubble) {
-                const formattedResponse = fullResponse.replace(/\*\*(.*?)\*\*/g, '<b class="text-purple-400 font-semibold">$1</b>');
-                modelBubble.innerHTML = formattedResponse;
+            // Function to correctly parse and display text and code blocks
+            function processAndDisplayModelResponse(fullResponse) {
+                const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+                let lastIndex = 0;
+                let match;
+
+                // Remove the initial "thinking" bubble
+                const thinkingBubble = document.querySelector('.thinking');
+                if (thinkingBubble) thinkingBubble.parentElement.remove();
+
+                // Find all code blocks and process text in between
+                while ((match = codeBlockRegex.exec(fullResponse)) !== null) {
+                    // 1. Append text before the code block
+                    const textBefore = fullResponse.substring(lastIndex, match.index).trim();
+                    if (textBefore) {
+                        const textBubble = appendMessage({ type: 'text', content: '' }, 'model');
+                        parseAndFormatText(textBefore, textBubble);
+                    }
+
+                    // 2. Append the code block
+                    const language = match[1] || 'markup';
+                    const code = match[2].trim();
+                    appendMessage({ type: 'code', language, code }, 'model');
+
+                    lastIndex = match.index + match[0].length;
+                }
+
+                // 3. Append any remaining text after the last code block
+                const remainingText = fullResponse.substring(lastIndex).trim();
+                if (remainingText) {
+                    const textBubble = appendMessage({ type: 'text', content: '' }, 'model');
+                    parseAndFormatText(remainingText, textBubble);
+                }
             }
+            
+            // Formats bold text and applies it to a bubble
+            function parseAndFormatText(text, bubble) {
+                 // Use a more specific regex to avoid issues with multiple asterisks
+                const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                bubble.innerHTML = formattedText;
+            }
+
 
             function appendMessage(content, sender) {
                 const messageWrapper = document.createElement('div');
@@ -349,30 +393,37 @@
                     code.textContent = content.code;
                     pre.appendChild(code);
                     messageBubble.appendChild(pre);
+                    // Use a small timeout to ensure the element is in the DOM before highlighting
                     setTimeout(() => Prism.highlightAllUnder(messageBubble), 0);
                 } else {
                     messageBubble = document.createElement('div');
                     messageBubble.className = `message-bubble p-3 rounded-2xl ${sender === 'user' ? 'user-bubble' : 'model-bubble'}`;
-                    messageBubble.innerHTML = content.content || content;
+                    if (content.content) {
+                        messageBubble.innerHTML = content.content;
+                    }
                 }
 
                 messageWrapper.appendChild(messageBubble);
                 chatMessages.appendChild(messageWrapper);
                 
+                // --- Dynamic border radius adjustment ---
                 if (content.type !== 'image' && content.type !== 'code') {
+                     // We need to yield to the main thread for the browser to calculate the height
                     requestAnimationFrame(() => {
                         const height = messageBubble.offsetHeight;
+                        // Approximate height of a single line message with padding
                         const singleLineHeight = 40; 
-                        const maxRadius = 24; 
-                        const minRadius = 16; 
+                        const maxRadius = 24; // px
+                        const minRadius = 16; // px
                         
+                        // Decrease radius as the bubble gets taller
                         const newRadius = Math.max(minRadius, maxRadius - (height - singleLineHeight) * 0.15);
                         messageBubble.style.borderRadius = `${newRadius}px`;
                     });
                 } else {
+                    // For non-text content, keep the standard radius
                     messageBubble.classList.add('rounded-2xl');
                 }
-
 
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 return messageBubble;
@@ -389,79 +440,51 @@
                 modal.classList.remove('flex');
             });
 
+            // --- Gemini API Call ---
             async function getGeminiResponse() {
-                // Поскольку ключ теперь пустой, мы должны использовать прокси или специальную конечную точку,
-                // предоставляемую средой. Для простоты здесь предполагается, что среда
-                // перехватывает этот fetch и вставляет ключ.
-                // Если бы это было реальное приложение, здесь был бы вызов к вашему бэкенду,
-                // который уже безопасно хранит ключ и делает запрос к API Google.
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`;
+                // Use the non-streaming API for simplicity and robustness
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
                 
+                // Show a thinking indicator
                 const modelBubble = appendMessage({ content: ''}, 'model');
-                modelBubble.innerHTML = '<div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse"></div>';
+                modelBubble.classList.add('thinking'); // Add a class to find and remove it later
+                modelBubble.innerHTML = '<div class="flex items-center gap-2 p-2"><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse"></div><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse delay-75"></div><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse delay-150"></div></div>';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
                 try {
                     const payload = {
-                        "contents": [...chatHistory],
+                        "contents": chatHistory, // Send the whole history
                         "systemInstruction": { "parts": [{ "text": systemInstructionText }] }
                     };
                     
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) throw new Error(`HTTP error ${response.status}: ${await response.text()}`);
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let buffer = '', fullResponse = '';
-                    modelBubble.innerHTML = '';
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) break;
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split('\n');
-                        buffer = lines.pop() || '';
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                const jsonStr = line.substring(6);
-                                try {
-                                    const parsed = JSON.parse(jsonStr);
-                                    const textPart = parsed.candidates[0]?.content?.parts[0]?.text;
-                                    if(textPart){
-                                        fullResponse += textPart;
-                                        parseAndAppend(fullResponse, modelBubble);
-                                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                                    }
-                                } catch (e) { /* Ignore incomplete JSON */ }
-                            }
-                        }
+                    const response = await fetch(apiUrl, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(payload) 
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error ${response.status}: ${await response.text()}`);
                     }
-                    if (fullResponse) {
-                        const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-                        if (codeBlockRegex.test(fullResponse)) {
-                            modelBubble.remove();
-                            const parts = fullResponse.split(codeBlockRegex);
-                            for(let i = 0; i < parts.length; i++){
-                                if(!parts[i] || !parts[i].trim()) continue;
-                                
-                                if (i > 0 && (i-1) % 3 === 0) {
-                                    appendMessage({
-                                        type: 'code',
-                                        language: parts[i-1] || 'markup',
-                                        code: parts[i+1].trim()
-                                    }, 'model');
-                                    i++;
-                                } else {
-                                    const textBubble = appendMessage({ content: '' }, 'model');
-                                    parseAndAppend(parts[i].trim(), textBubble);
-                                }
-                            }
-                        } else {
-                            parseAndAppend(fullResponse, modelBubble);
-                        }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                        const fullResponseText = result.candidates[0].content.parts[0].text;
                         
-                        chatHistory.push({ role: 'model', parts: [{ text: fullResponse }] });
+                        // Process and display the potentially mixed content
+                        processAndDisplayModelResponse(fullResponseText);
+                        
+                        // Add the model's response to the history for context in future requests
+                        chatHistory.push({ role: 'model', parts: [{ text: fullResponseText }] });
                     } else {
-                        modelBubble.textContent = "Не удалось получить ответ.";
+                        throw new Error("Invalid response structure from API.");
                     }
+
                 } catch (error) {
-                    modelBubble.textContent = "Произошла ошибка. Проверьте API-ключ или попробуйте снова.";
+                    const thinkingBubble = document.querySelector('.thinking');
+                    if (thinkingBubble) thinkingBubble.parentElement.remove();
+                    appendMessage({ content: "Произошла ошибка. Пожалуйста, попробуйте снова." }, 'model');
                     console.error("Error fetching Gemini response:", error);
                 }
             }
