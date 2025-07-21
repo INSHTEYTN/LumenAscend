@@ -3,513 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Naomi">
-    
-    <title>Чат с Naomi</title>
+    <title>Lumen Ascend Шейдеры Minecraft</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #0b1120; 
-            color: #e2e8f0; 
-            overflow: hidden;
-            background-image: url('https://i.pinimg.com/736x/95/8d/34/958d341ff94a4952f67b6fcd01d579ff.jpg');
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://i.pinimg.com/1200x/4e/24/c3/4e24c303c7a8fed33171fbee101917e8.jpg');
             background-size: cover;
-            background-position: center center;
+            background-position: center;
             background-attachment: fixed;
-        }
-        
-        .liquid-glass {
-            background: rgba(30, 41, 59, 0.4); 
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-        
-        .form-input::placeholder { color: #64748b; }
-
-        /* --- Стили для чата --- */
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 5px #a78bfa, 0 0 10px #a78bfa; }
-            50% { text-shadow: 0 0 10px #c4b5fd, 0 0 20px #c4b5fd; }
-        }
-        .glowing-text {
-            color: #c4b5fd;
-            animation: glow 3s ease-in-out infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow-y: auto;
         }
 
-        .message-bubble { max-width: 85%; word-wrap: break-word; transition: border-radius 0.4s ease;}
-        .user-bubble { background-color: #3b82f6; color: white; }
-        .model-bubble { background-color: #374151; color: white; }
-        .model-bubble b {
-            color: #c4b5fd;
-            font-weight: 700;
-        }
-        
-        #chat-input::-webkit-scrollbar, #chat-messages::-webkit-scrollbar { display: none; }
-        #chat-input, #chat-messages { scrollbar-width: none; -ms-overflow-style: none; }
-        
-        .naomi-font {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-        
-        .code-block, pre[class*="language-"], code[class*="language-"] { font-family: 'JetBrains Mono', monospace; }
-        .code-block { background-color: transparent !important; }
-        
-        pre[class*="language-"] {
-            margin: 0;
-            padding: 1rem !important;
-            border-radius: 1rem;
-            font-size: 0.875rem;
-            background: rgba(40, 50, 70, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            backdrop-filter: blur(5px) !important;
-            -webkit-backdrop-filter: blur(5px) !important;
-            overflow-x: auto; 
-            scrollbar-width: none;
-            -ms-overflow-style: none; 
-        }
-        pre[class*="language-"]::-webkit-scrollbar {
-            display: none;
-        }
-
-
-        #settings-screen {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-        #chat-container {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-        
-        #preloader {
-            transition: opacity 0.5s ease-out;
-        }
-        .loader-bar {
-            height: 4px;
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            background-color: rgba(255,255,255,0.1);
-        }
-        .loader-bar-inner {
             height: 100%;
-            width: 0%;
-            background-color: #a78bfa;
-            transition: width 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
 
+        .glass-effect {
+            background-color: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border-radius: 2rem;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* Общие стили для всех кнопок */
+        .btn-base {
+            padding: 1rem 2.5rem;
+            border-radius: 1.75rem;
+            transition: all 0.3s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            color: white; /* Цвет текста кнопок */
+        }
+
+        .btn-base:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Стеклянный эффект для кнопок */
+        .btn-glass {
+            background-color: rgba(255, 255, 255, 0.15); /* Более заметная прозрачность для кнопок */
+            backdrop-filter: blur(10px); /* Размытие для стеклянного эффекта */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Тонкая рамка */
+        }
+
+        .btn-glass:hover {
+            background-color: rgba(255, 255, 255, 0.25); /* Усиление прозрачности при наведении */
+        }
+
+        /* Стили для галереи карточек */
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .gallery-card {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s ease-in-out, z-index 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            transform-origin: center bottom;
+        }
+
+        .gallery-card .overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .gallery-card:hover .overlay {
+            opacity: 1;
+        }
+
+        /* Стили для блоков версий - теперь снова прямоугольные с закругленными углами */
+        .version-card {
+            position: relative;
+            overflow: hidden;
+            /* Возвращаем к стандартным отступам и форме */
+            padding: 2.5rem; /* Уменьшенный отступ для меньшего размера блока */
+            border-radius: 2rem; /* Скругленные углы */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Стандартная тень glass-effect */
+        }
+
+        /* Адаптивные настройки */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .glass-effect {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .text-6xl {
+                font-size: 3.5rem;
+            }
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+            .text-4xl {
+                font-size: 2.5rem;
+            }
+            .text-xl {
+                font-size: 1.125rem;
+            }
+            .btn-base {
+                padding: 0.75rem 1.5rem;
+                border-radius: 1.25rem;
+                font-size: 0.9rem;
+            }
+            .gallery-container {
+                height: 300px;
+            }
+            .version-card {
+                padding: 1.5rem; /* Меньший отступ на мобильных */
+            }
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-    
-    <div id="preloader" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex flex-col items-center justify-center">
-        <div class="liquid-glass p-8 rounded-2xl flex flex-col items-center gap-4">
-            <h1 class="text-4xl naomi-font">Naomi</h1>
-            <div class="loader-bar w-48 rounded-full overflow-hidden">
-                <div id="loader-bar-inner" class="loader-bar-inner rounded-full"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="fullscreen-modal" class="fixed inset-0 bg-black/80 z-50 hidden justify-center items-center p-4">
-        <img id="fullscreen-image" class="max-w-full max-h-full object-contain">
-        <button id="modal-close" class="absolute top-5 right-5 text-white text-5xl font-bold">&times;</button>
-    </div>
-
-    <div id="chat-container" class="w-full max-w-2xl h-[90vh] md:h-[85vh] flex flex-col liquid-glass rounded-2xl opacity-0">
-        <header class="flex-shrink-0 flex items-center justify-center p-4 border-b border-white/10 relative">
-            <button id="settings-open-btn" class="flex items-center gap-2 group">
-                <h2 class="text-2xl naomi-font transition-colors group-hover:text-sky-300">Naomi</h2>
-            </button>
+<body class="text-gray-100">
+    <div class="container mx-auto p-6 flex flex-col items-center">
+        <!-- Секция заголовка - Вне блока glass-effect -->
+        <header class="text-center mt-8 mb-12">
+            <h1 class="text-6xl font-extrabold mb-6 text-white drop-shadow-xl leading-tight">
+                Lumen Ascend Шейдеры Minecraft
+            </h1>
+            <p class="text-2xl text-gray-200 leading-relaxed max-w-2xl mx-auto">
+                Погрузитесь в мир Minecraft с невиданной ранее красотой и реализмом.
+                Наши шейдеры преобразуют каждый пиксель!
+            </p>
         </header>
-        <div id="chat-messages" class="flex-grow overflow-y-auto p-4 space-y-4 flex flex-col">
-            <div id="welcome-message" class="text-center p-8 m-auto">
-                <h3 class="text-2xl font-bold glowing-text">Чем могу помочь?</h3>
-            </div>
-        </div>
-        <footer class="flex-shrink-0 p-2">
-            <div id="image-preview-container" class="px-2 pb-2"></div>
-            <form id="chat-form" class="relative flex items-center">
-                <label for="image-upload" class="p-2 cursor-pointer text-slate-400 hover:text-sky-300">
-                    <i class="ph-bold ph-paperclip text-2xl"></i>
-                </label>
-                <input type="file" id="image-upload" class="hidden" accept="image/*">
-                
-                <div class="relative w-full flex items-center">
-                    <textarea id="chat-input" rows="1" class="form-input liquid-glass bg-transparent w-full p-3 pr-12 rounded-full resize-none outline-none border-transparent focus:border-blue-500"></textarea>
-                    <button id="send-btn" type="submit" class="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-sky-300 opacity-0 pointer-events-none transition-opacity duration-300">
-                        <i class="ph-bold ph-paper-plane-tilt text-2xl"></i>
-                    </button>
+
+        <!-- Основной контент -->
+        <main class="w-full flex flex-col items-center">
+            <!-- Секция версий шейдеров -->
+            <section class="w-full max-w-5xl mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Карточка Light версии -->
+                <div class="glass-effect version-card text-center flex flex-col items-center justify-between">
+                    <div>
+                        <h2 class="text-4xl font-bold mb-4 text-white">Light Версия</h2>
+                        <p class="text-xl text-gray-200 mb-8 leading-relaxed">
+                            Оптимизирована для слабых ПК, обеспечивает улучшенную графику без значительной потери производительности.
+                        </p>
+                    </div>
+                    <a href="https://disk.yandex.kz/d/8oojo1Wy5e8pzQ" target="_blank" class="btn-base btn-glass">
+                        Скачать Light
+                        <!-- Иконка установки от Google Material Design -->
+                        <svg class="ml-4 -mr-1 w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                    </a>
                 </div>
-            </form>
+
+                <!-- Карточка Pro версии -->
+                <div class="glass-effect version-card text-center flex flex-col items-center justify-between">
+                    <div>
+                        <h2 class="text-4xl font-bold mb-4 text-white">Pro Версия</h2>
+                        <p class="text-xl text-gray-200 mb-8 leading-relaxed">
+                            Для средних и мощных ПК, предлагает максимальное качество графики и все новейшие эффекты.
+                        </p>
+                    </div>
+                    <a href="https://disk.yandex.kz/d/doEWuX9FwAURtA" target="_blank" class="btn-base btn-glass">
+                        Скачать Pro
+                        <!-- Иконка установки от Google Material Design -->
+                        <svg class="ml-4 -mr-1 w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Секция галереи изображений -->
+            <section class="glass-effect text-center p-8 w-full max-w-5xl mb-12">
+                <h2 class="text-4xl font-bold mb-8 text-white">Галерея Шейдеров</h2>
+                <div id="gallery-container" class="gallery-container">
+                    <!-- Карточки галереи -->
+                    <div class="gallery-card" style="background-image: url('https://ru-minecraft.ru/uploads/posts/2020-05/1588342045_1.jpg');">
+                        <div class="overlay">
+                            <span class="text-white text-2xl font-bold">Нажмите для следующего</span>
+                        </div>
+                    </div>
+                    <div class="gallery-card" style="background-image: url('https://images.wondershare.com/filmora/article-images/best-minecraft-shaders-seus.jpg');">
+                        <div class="overlay">
+                            <span class="text-white text-2xl font-bold">Нажмите для следующего</span>
+                        </div>
+                    </div>
+                    <div class="gallery-card" style="background-image: url('https://images.wondershare.com/filmora/article-images/best-minecraft-shaders-projectluma.png');">
+                        <div class="overlay">
+                            <span class="text-white text-2xl font-bold">Нажмите для следующего</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция поддержки -->
+            <section class="glass-effect text-center p-8 w-full max-w-5xl mb-12">
+                <h2 class="text-4xl font-bold mb-8 text-white">Нужна Помощь?</h2>
+                <p class="text-xl text-gray-200 mb-8 leading-relaxed max-w-3xl mx-auto">
+                    Если у вас возникли вопросы или нужна поддержка, свяжитесь с нами в Telegram.
+                </p>
+                <a href="https://t.me/LolliTune" target="_blank" class="btn-base btn-glass">
+                    Поддержка Telegram
+                    <!-- Иконка Telegram удалена -->
+                </a>
+            </section>
+        </main>
+
+        <!-- Секция футера -->
+        <footer class="text-center glass-effect p-4 mb-4">
+            <p class="text-sm text-gray-300">&copy; 2025 Lumen Ascend. Все права защищены.</p>
         </footer>
     </div>
-    
-    <div id="settings-screen" class="w-11/12 max-w-lg p-6 liquid-glass rounded-2xl hidden">
-        <header class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold">Настройки</h2>
-            <button id="settings-close-btn" class="text-slate-300 hover:text-white font-semibold transition-colors">Назад</button>
-        </header>
-        <div class="space-y-4">
-            <h3 class="font-semibold">Фон чата</h3>
-            <div class="flex items-center gap-2">
-                <input id="bg-url-input" type="text" class="form-input liquid-glass bg-transparent w-full p-2 rounded-lg outline-none border-transparent focus:border-sky-500" placeholder="Вставьте ссылку на изображение...">
-                <button id="apply-bg-btn" class="liquid-glass px-4 py-2 rounded-full font-semibold hover:bg-slate-700/50">Применить</button>
-            </div>
-            <div class="flex items-center gap-4">
-                <label for="upload-bg-input" class="liquid-glass bg-[rgba(30,41,59,0.25)] w-full text-center py-2 rounded-full font-semibold hover:bg-slate-700/50 cursor-pointer">Загрузить фото</label>
-                <input type="file" id="upload-bg-input" class="hidden" accept="image/*">
-                <button id="restore-bg-btn" class="liquid-glass w-full py-2 rounded-full font-semibold hover:bg-slate-700/50">По умолчанию</button>
-            </div>
-        </div>
-    </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Element Selection ---
-            const chatContainer = document.getElementById('chat-container');
-            const settingsScreen = document.getElementById('settings-screen');
-            const preloader = document.getElementById('preloader');
-            const loaderBar = document.getElementById('loader-bar-inner');
-            const settingsOpenBtn = document.getElementById('settings-open-btn');
-            const settingsCloseBtn = document.getElementById('settings-close-btn');
-            const bgUrlInput = document.getElementById('bg-url-input');
-            const applyBgBtn = document.getElementById('apply-bg-btn');
-            const uploadBgInput = document.getElementById('upload-bg-input');
-            const restoreBgBtn = document.getElementById('restore-bg-btn');
-            const chatForm = document.getElementById('chat-form');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-            const chatMessages = document.getElementById('chat-messages');
-            const welcomeMessage = document.getElementById('welcome-message');
-            const imageUploadInput = document.getElementById('image-upload');
-            const imagePreviewContainer = document.getElementById('image-preview-container');
-            const modal = document.getElementById('fullscreen-modal');
-            const modalImage = document.getElementById('fullscreen-image');
-            const modalClose = document.getElementById('modal-close');
-            
-            // --- Constants and State ---
-            const defaultBg = "url('https://i.pinimg.com/736x/95/8d/34/958d341ff94a4952f67b6fcd01d579ff.jpg')";
-            const GEMINI_API_KEY = ""; 
-            const systemInstructionText = "Твое имя - Naomi. Ты — дружелюбный и эмпатичный AI-собеседник. Твоя цель - честно и открыто общаться с пользователем, помогая ему со всем необходимым. Ты можешь анализировать изображения, которые присылает пользователь, и давать по ним советы или просто обсуждать их. Не упоминай, что ты языковая модель или AI от Google. Ты была создана разработчиком по имени Lolli (его телеграм @lollitune). Ты можешь упоминать его, если это будет уместно. Также ты можешь писать код на разных языках программирования. Когда пишешь код, всегда указывай язык после тройных кавычек, например: ```javascript.";
-            
-            let chatHistory = [];
-            let isFirstMessage = true;
-            let uploadedImageData = null;
+            const galleryContainer = document.getElementById('gallery-container');
+            let cards = Array.from(galleryContainer.querySelectorAll('.gallery-card'));
 
-            // --- Loader Logic ---
-            setTimeout(() => {
-                if (loaderBar) loaderBar.style.width = '100%';
-            }, 100);
-            setTimeout(() => {
-                if (preloader) {
-                    preloader.style.opacity = '0';
-                    preloader.style.pointerEvents = 'none';
-                }
-                if (chatContainer) chatContainer.style.opacity = '1';
-            }, 1500);
+            // Функция для обновления позиций карточек
+            function updateCardPositions() {
+                const totalCards = cards.length;
+                cards.forEach((card, index) => {
+                    const zIndex = totalCards - index;
+                    card.style.zIndex = zIndex;
 
+                    const translateY = index * 10;
+                    const scale = 1 - (index * 0.03);
+                    const rotation = index * 0.5;
 
-            // --- Settings Logic ---
-            function showSettings(show) {
-                settingsScreen.classList.toggle('hidden', !show);
-                chatContainer.classList.toggle('hidden', show);
-            }
-            settingsOpenBtn.addEventListener('click', () => showSettings(true));
-            settingsCloseBtn.addEventListener('click', () => showSettings(false));
-
-            function setBackground(url) {
-                document.body.style.backgroundImage = `url('${url}')`;
+                    card.style.transition = 'transform 0.5s ease-in-out, z-index 0.5s ease-in-out';
+                    card.style.transform = `translateY(${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
+                    card.style.transformOrigin = 'center bottom';
+                });
             }
 
-            applyBgBtn.addEventListener('click', () => {
-                const url = bgUrlInput.value.trim();
-                if(url) {
-                    setBackground(url);
-                    localStorage.setItem('customBg', url);
-                }
-            });
+            // Добавляем слушатель кликов к каждой карточке
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out';
+                    card.style.transform = `translateY(200px) scale(0.7) rotate(15deg)`;
+                    card.style.opacity = '0';
 
-            restoreBgBtn.addEventListener('click', () => {
-                document.body.style.backgroundImage = defaultBg;
-                localStorage.removeItem('customBg');
-            });
-
-            uploadBgInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const dataUrl = event.target.result;
-                        setBackground(dataUrl);
-                        localStorage.setItem('customBg', dataUrl);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            const savedBg = localStorage.getItem('customBg');
-            if(savedBg) {
-                setBackground(savedBg);
-            }
-            
-            // --- Chat Logic ---
-            imageUploadInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const imageDataUrl = event.target.result;
-                        uploadedImageData = imageDataUrl.split(',')[1];
-                        imagePreviewContainer.innerHTML = `<div class="relative inline-block"><img src="${imageDataUrl}" class="h-16 w-16 object-cover rounded-lg"><button id="cancel-upload" class="absolute -top-2 -right-2 bg-red-500 rounded-full h-6 w-6 flex items-center justify-center text-white">&times;</button></div>`;
-                        document.getElementById('cancel-upload').addEventListener('click', () => {
-                            uploadedImageData = null;
-                            imagePreviewContainer.innerHTML = '';
-                            imageUploadInput.value = '';
-                            chatInput.dispatchEvent(new Event('input'));
-                        });
-                        chatInput.dispatchEvent(new Event('input'));
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    chatForm.dispatchEvent(new Event('submit'));
-                }
-            });
-
-            chatInput.addEventListener('input', () => {
-                const hasText = chatInput.value.trim().length > 0 || uploadedImageData;
-                sendBtn.classList.toggle('opacity-0', !hasText);
-                sendBtn.classList.toggle('pointer-events-none', !hasText);
-            });
-
-            chatForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const userMessage = chatInput.value.trim();
-                if (userMessage || uploadedImageData) {
-                    handleUserMessage(userMessage);
-                    imagePreviewContainer.innerHTML = '';
-                    imageUploadInput.value = ''; // Clear file input
-                }
-            });
-            
-            function handleUserMessage(message) {
-                if (isFirstMessage) {
-                    welcomeMessage.style.display = 'none';
-                    isFirstMessage = false;
-                }
-                const userParts = [];
-                if (uploadedImageData) {
-                    const imageUrl = `data:image/jpeg;base64,${uploadedImageData}`;
-                    appendMessage({ type: 'image', src: imageUrl }, 'user');
-                    userParts.push({ inlineData: { mimeType: 'image/jpeg', data: uploadedImageData } });
-                    uploadedImageData = null;
-                }
-                if (message) {
-                    appendMessage({ type: 'text', content: message }, 'user');
-                    userParts.push({ text: message });
-                }
-                
-                if (userParts.length > 0) {
-                    chatHistory.push({ role: 'user', parts: userParts });
-                    getGeminiResponse();
-                }
-                chatInput.value = '';
-                chatInput.dispatchEvent(new Event('input'));
-            }
-
-            function processAndDisplayModelResponse(fullResponse) {
-                const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-                let lastIndex = 0;
-                let match;
-
-                const thinkingBubble = document.querySelector('.thinking');
-                if (thinkingBubble) thinkingBubble.parentElement.remove();
-
-                while ((match = codeBlockRegex.exec(fullResponse)) !== null) {
-                    const textBefore = fullResponse.substring(lastIndex, match.index).trim();
-                    if (textBefore) {
-                        const textBubble = appendMessage({ type: 'text', content: '' }, 'model');
-                        parseAndFormatText(textBefore, textBubble);
-                    }
-
-                    const language = match[1] || 'markup';
-                    const code = match[2].trim();
-                    appendMessage({ type: 'code', language, code }, 'model');
-
-                    lastIndex = match.index + match[0].length;
-                }
-
-                const remainingText = fullResponse.substring(lastIndex).trim();
-                if (remainingText) {
-                    const textBubble = appendMessage({ type: 'text', content: '' }, 'model');
-                    parseAndFormatText(remainingText, textBubble);
-                }
-            }
-            
-            function parseAndFormatText(text, bubble) {
-                const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                bubble.innerHTML = formattedText;
-            }
-
-
-            function appendMessage(content, sender) {
-                const messageWrapper = document.createElement('div');
-                messageWrapper.className = `w-full flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
-                
-                let messageBubble;
-
-                if (content.type === 'image') {
-                    messageBubble = document.createElement('img');
-                    messageBubble.src = content.src;
-                    messageBubble.className = 'w-48 h-auto rounded-2xl cursor-pointer';
-                    messageBubble.addEventListener('click', () => openModal(content.src));
-                } else if (content.type === 'code') {
-                    messageBubble = document.createElement('div');
-                    messageBubble.className = `w-full max-w-full model-bubble code-block relative`;
-                    
-                    const pre = document.createElement('pre');
-                    pre.className = 'language-' + content.language;
-                    const code = document.createElement('code');
-                    code.textContent = content.code;
-                    pre.appendChild(code);
-
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = "absolute top-2 right-2 p-1.5 rounded-md text-slate-300 hover:text-white";
-                    copyBtn.innerHTML = '<i class="ph ph-copy text-lg"></i>';
-                    copyBtn.title = "Копировать код";
-
-                    copyBtn.addEventListener('click', () => {
-                        const textArea = document.createElement('textarea');
-                        textArea.value = content.code;
-                        textArea.style.position = 'fixed';
-                        textArea.style.top = '0';
-                        textArea.style.left = '0';
-                        document.body.appendChild(textArea);
-                        textArea.focus();
-                        textArea.select();
-                        try {
-                            document.execCommand('copy');
-                            copyBtn.innerHTML = '<i class="ph ph-check-circle text-lg text-green-400"></i>';
-                            copyBtn.title = "Скопировано!";
-                        } catch (err) {
-                            copyBtn.title = "Ошибка при копировании";
-                            console.error('Fallback: Oops, unable to copy', err);
-                        }
-                        document.body.removeChild(textArea);
-
-                        setTimeout(() => {
-                           copyBtn.innerHTML = '<i class="ph ph-copy text-lg"></i>';
-                           copyBtn.title = "Копировать код";
-                        }, 2000);
-                    });
-
-                    messageBubble.appendChild(pre);
-                    messageBubble.appendChild(copyBtn);
-                    
-                    // Using Prism.highlightElement for more robust highlighting, especially on mobile.
-                    // The timeout ensures the element is in the DOM before Prism runs.
                     setTimeout(() => {
-                        Prism.highlightElement(code);
-                    }, 0);
+                        galleryContainer.removeChild(card);
+                        galleryContainer.appendChild(card);
 
-                } else {
-                    messageBubble = document.createElement('div');
-                    messageBubble.className = `message-bubble p-3 rounded-2xl ${sender === 'user' ? 'user-bubble' : 'model-bubble'}`;
-                    if (content.content) {
-                        messageBubble.innerHTML = content.content;
-                    }
-                }
+                        cards = Array.from(galleryContainer.querySelectorAll('.gallery-card'));
 
-                messageWrapper.appendChild(messageBubble);
-                chatMessages.appendChild(messageWrapper);
-                
-                if (content.type !== 'image' && content.type !== 'code') {
-                    requestAnimationFrame(() => {
-                        const height = messageBubble.offsetHeight;
-                        const singleLineHeight = 40; 
-                        const maxRadius = 24; 
-                        const minRadius = 16;
-                        const newRadius = Math.max(minRadius, maxRadius - (height - singleLineHeight) * 0.15);
-                        messageBubble.style.borderRadius = `${newRadius}px`;
-                    });
-                } else if (content.type !== 'code') {
-                    messageBubble.classList.add('rounded-2xl');
-                }
+                        card.style.transition = 'none';
+                        card.style.opacity = '1';
+                        card.style.transform = '';
 
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                return messageBubble;
-            }
-
-            function openModal(src) {
-                modalImage.src = src;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-            
-            modalClose.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+                        updateCardPositions();
+                    }, 500);
+                });
             });
 
-            async function getGeminiResponse() {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-                
-                const modelBubble = appendMessage({ content: ''}, 'model');
-                modelBubble.classList.add('thinking');
-                modelBubble.innerHTML = '<div class="flex items-center gap-2 p-2"><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse"></div><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse delay-75"></div><div class="h-2 w-2 bg-slate-400 rounded-full animate-pulse delay-150"></div></div>';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                try {
-                    const payload = {
-                        "contents": chatHistory,
-                        "systemInstruction": { "parts": [{ "text": systemInstructionText }] }
-                    };
-                    
-                    const response = await fetch(apiUrl, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify(payload) 
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error ${response.status}: ${await response.text()}`);
-                    }
-
-                    const result = await response.json();
-
-                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
-                        const fullResponseText = result.candidates[0].content.parts[0].text;
-                        
-                        processAndDisplayModelResponse(fullResponseText);
-                        
-                        chatHistory.push({ role: 'model', parts: [{ text: fullResponseText }] });
-                    } else {
-                        throw new Error("Invalid response structure from API.");
-                    }
-
-                } catch (error) {
-                    const thinkingBubble = document.querySelector('.thinking');
-                    if (thinkingBubble) thinkingBubble.parentElement.remove();
-                    appendMessage({ content: "Произошла ошибка. Пожалуйста, попробуйте снова." }, 'model');
-                    console.error("Error fetching Gemini response:", error);
-                }
-            }
+            // Начальная настройка позиций карточек
+            updateCardPositions();
         });
     </script>
 </body>
