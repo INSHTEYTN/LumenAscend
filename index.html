@@ -13,7 +13,7 @@
             background-image: url('https://i.pinimg.com/1200x/4e/24/c3/4e24c303c7a8fed33171fbee101917e8.jpg');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
+            background-attachment: fixed; /* Фон фиксирован */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -26,7 +26,7 @@
 
         body::before {
             content: '';
-            position: fixed;
+            position: fixed; /* Наложение фиксировано */
             top: 0;
             left: 0;
             width: 100%;
@@ -122,48 +122,60 @@
             opacity: 1;
         }
 
-        /* Стили для блоков версий - теперь снова прямоугольные с закругленными углами */
+        /* Стили для блоков версий */
         .version-card {
             position: relative;
             overflow: hidden;
-            /* Возвращаем к стандартным отступам и форме */
             padding: 2.5rem; /* Уменьшенный отступ для меньшего размера блока */
             border-radius: 2rem; /* Скругленные углы */
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Стандартная тень glass-effect */
         }
 
-        /* Адаптивные настройки */
+        /* Адаптивные настройки для мобильных устройств */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
             .glass-effect {
-                padding: 1.5rem;
+                padding: 1.5rem; /* Уменьшенный отступ для блоков */
                 border-radius: 1.5rem;
                 margin-bottom: 1.5rem;
             }
             .text-6xl {
-                font-size: 3.5rem;
+                font-size: 2.5rem; /* Уменьшенный размер заголовка */
             }
             .text-2xl {
-                font-size: 1.25rem;
+                font-size: 1rem; /* Уменьшенный размер подзаголовка */
             }
             .text-4xl {
-                font-size: 2.5rem;
+                font-size: 2rem; /* Уменьшенный размер заголовков секций */
             }
             .text-xl {
-                font-size: 1.125rem;
+                font-size: 0.9rem; /* Уменьшенный размер основного текста */
             }
             .btn-base {
-                padding: 0.75rem 1.5rem;
-                border-radius: 1.25rem;
-                font-size: 0.9rem;
+                padding: 0.6rem 1.2rem; /* Уменьшенный отступ для кнопок */
+                border-radius: 1rem; /* Меньшие скругления для кнопок */
+                font-size: 0.8rem; /* Уменьшенный размер шрифта кнопок */
             }
             .gallery-container {
-                height: 300px;
+                height: 250px; /* Меньшая высота галереи на мобильных */
             }
             .version-card {
-                padding: 1.5rem; /* Меньший отступ на мобильных */
+                padding: 1rem; /* Еще меньший отступ на мобильных */
+            }
+            /* Секция версий шейдеров: 2 колонки на мобильных */
+            .version-section-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Принудительно 2 колонки */
+                gap: 0.75rem; /* Уменьшенный промежуток между карточками */
+            }
+            /* Уменьшение текста в футере */
+            .footer-text {
+                font-size: 0.75rem;
+            }
+            .footer-block {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
             }
         }
     </style>
@@ -184,7 +196,7 @@
         <!-- Основной контент -->
         <main class="w-full flex flex-col items-center">
             <!-- Секция версий шейдеров -->
-            <section class="w-full max-w-5xl mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section class="w-full max-w-5xl mb-12 grid version-section-grid gap-8">
                 <!-- Карточка Light версии -->
                 <div class="glass-effect version-card text-center flex flex-col items-center justify-between">
                     <div>
@@ -259,8 +271,8 @@
         </main>
 
         <!-- Секция футера -->
-        <footer class="text-center glass-effect p-4 mb-4">
-            <p class="text-sm text-gray-300">&copy; 2025 Lumen Ascend. Все права защищены.</p>
+        <footer class="text-center glass-effect footer-block">
+            <p class="text-sm text-gray-300 footer-text">&copy; 2025 Lumen Ascend. Все права защищены.</p>
         </footer>
     </div>
 
