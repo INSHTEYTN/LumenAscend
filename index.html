@@ -1,327 +1,601 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumen Ascend Шейдеры Minecraft</title>
+    <title>Lumen Ascend Shaders</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols Outlined for various icons (discord, telegram are no longer needed as their buttons are gone) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=download,folder_open,play_arrow,settings" />
     <style>
+        /* General styles for background and font */
         body {
             font-family: 'Inter', sans-serif;
-            background-image: url('https://i.pinimg.com/1200x/4e/24/c3/4e24c303c7a8fed33171fbee101917e8.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* Фон фиксирован */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 20px;
-            color: #e0e0e0;
-            overflow-y: auto;
+            background-color: #f0f2f5; /* Very light background */
+            color: #1f2937; /* Dark text */
+            position: relative; /* For canvas positioning */
         }
 
-        body::before {
+        /* Custom Tailwind classes */
+        .gradient-text {
+            background: linear-gradient(45deg, #7c3aed, #14b8a6); /* Darker gradient for light background */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Button animation */
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4); /* Shadow from purple */
+        }
+
+        .btn-glow::before {
             content: '';
-            position: fixed; /* Наложение фиксировано */
+            position: absolute;
             top: 0;
-            left: 0;
+            left: -100%;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: -1;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.7s ease;
         }
 
-        .glass-effect {
-            background-color: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            border-radius: 2rem;
-            padding: 3rem;
-            margin-bottom: 2rem;
-            width: 100%;
-            max-width: 900px;
+        .btn-glow:hover::before {
+            left: 100%;
         }
 
-        /* Общие стили для всех кнопок */
-        .btn-base {
-            padding: 1rem 2.5rem;
-            border-radius: 1.75rem;
-            transition: all 0.3s ease-in-out;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            text-decoration: none;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            color: white; /* Цвет текста кнопок */
+        /* Card animation */
+        .card-hover-effect {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .btn-base:hover {
+        .card-hover-effect:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Light shadow for light background */
         }
 
-        /* Стеклянный эффект для кнопок */
-        .btn-glass {
-            background-color: rgba(255, 255, 255, 0.15); /* Более заметная прозрачность для кнопок */
-            backdrop-filter: blur(10px); /* Размытие для стеклянного эффекта */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* Тонкая рамка */
+        /* Hero section animation (text) */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .btn-glass:hover {
-            background-color: rgba(255, 255, 255, 0.25); /* Усиление прозрачности при наведении */
+        .animate-fade-in-down {
+            animation: fadeInDown 1s ease-out forwards;
         }
 
-        /* Стили для галереи карточек */
-        .gallery-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            height: 350px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
+        /* Hero section animation (button) */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .gallery-card {
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+            animation-delay: 0.5s; /* Delay for button */
+            opacity: 0; /* Initial state hidden */
+        }
+
+        /* Pro version gradient animation */
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .pro-card-bg-animated {
+            background: linear-gradient(90deg, #7c3aed, #14b8a6, #7c3aed);
+            background-size: 200% 200%;
+            animation: gradient-animation 8s ease infinite;
+        }
+
+        /* Language dropdown */
+        .dropdown-content {
+            display: none;
             position: absolute;
-            width: 90%;
-            height: 90%;
-            border-radius: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
-            transition: transform 0.5s ease-in-out, z-index 0.5s ease-in-out, opacity 0.5s ease-in-out;
-            transform-origin: center bottom;
+            background-color: #ffffff;
+            min-width: 150px; /* Slightly wider for flags */
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 1.5rem; /* rounded-3xl */
+            right: 0;
+            top: 100%; /* Position below the button */
+            margin-top: 0.5rem; /* Space below button */
         }
 
-        .gallery-card .overlay {
-            position: absolute;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: flex;
+        /* Show dropdown on click */
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: flex; /* Use flex for flag and text alignment */
             align-items: center;
-            justify-content: center;
+            border-radius: 1.5rem; /* rounded-3xl */
+        }
+
+        .dropdown-content a span {
+            margin-right: 8px; /* Space between flag and text */
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Navbar dynamic styles */
+        #mainNav {
+            background-color: rgba(255, 255, 255, 0.9); /* Liquid glass effect */
+            backdrop-filter: blur(8px); /* Liquid glass effect */
+            padding: 1rem; /* Adjust padding as needed */
+            z-index: 50;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: width 0.3s ease-in-out, border-radius 0.3s ease-in-out, left 0.3s ease-in-out, transform 0.3s ease-in-out, top 0.3s ease-in-out;
+            position: fixed; /* Always fixed */
+            box-sizing: border-box; /* Ensure padding/border are included in width calculation */
+        }
+
+        .nav-initial {
+            width: calc(100% - 8rem); /* Shorter length, adjust as needed */
+            max-width: 900px; /* Limit max width for larger screens */
+            border-radius: 9999px; /* Fully round */
+            left: 50%;
+            transform: translateX(-50%);
+            top: 1rem; /* Small margin from top */
+        }
+
+        .nav-scrolled {
+            width: 100%; /* Full length */
+            border-radius: 0px; /* Sharp angles */
+            left: 0;
+            transform: translateX(0);
+            top: 0; /* Stick to top */
+        }
+
+        /* Scroll Reveal Animation */
+        .scroll-reveal {
             opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
 
-        .gallery-card:hover .overlay {
+        .scroll-reveal.is-visible {
             opacity: 1;
-        }
-
-        /* Стили для блоков версий */
-        .version-card {
-            position: relative;
-            overflow: hidden;
-            padding: 2.5rem; /* Уменьшенный отступ для меньшего размера блока */
-            border-radius: 2rem; /* Скругленные углы */
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Стандартная тень glass-effect */
-        }
-
-        /* Адаптивные настройки для мобильных устройств */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            .glass-effect {
-                padding: 1.5rem; /* Уменьшенный отступ для блоков */
-                border-radius: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-            .text-6xl {
-                font-size: 2.5rem; /* Уменьшенный размер заголовка */
-            }
-            .text-2xl {
-                font-size: 1rem; /* Уменьшенный размер подзаголовка */
-            }
-            .text-4xl {
-                font-size: 2rem; /* Уменьшенный размер заголовков секций */
-            }
-            .text-xl {
-                font-size: 0.9rem; /* Уменьшенный размер основного текста */
-            }
-            .btn-base {
-                padding: 0.6rem 1.2rem; /* Уменьшенный отступ для кнопок */
-                border-radius: 1rem; /* Меньшие скругления для кнопок */
-                font-size: 0.8rem; /* Уменьшенный размер шрифта кнопок */
-            }
-            .gallery-container {
-                height: 250px; /* Меньшая высота галереи на мобильных */
-            }
-            .version-card {
-                padding: 1rem; /* Еще меньший отступ на мобильных */
-            }
-            /* Секция версий шейдеров: 2 колонки на мобильных */
-            .version-section-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr)); /* Принудительно 2 колонки */
-                gap: 0.75rem; /* Уменьшенный промежуток между карточками */
-            }
-            /* Уменьшение текста в футере */
-            .footer-text {
-                font-size: 0.75rem;
-            }
-            .footer-block {
-                padding: 0.75rem;
-                margin-bottom: 0.75rem;
-            }
+            transform: translateY(0);
         }
     </style>
 </head>
-<body class="text-gray-100">
-    <div class="container mx-auto p-6 flex flex-col items-center">
-        <!-- Секция заголовка - Вне блока glass-effect -->
-        <header class="text-center mt-8 mb-12">
-            <h1 class="text-6xl font-extrabold mb-6 text-white drop-shadow-xl leading-tight">
-                Lumen Ascend Шейдеры Minecraft
-            </h1>
-            <p class="text-2xl text-gray-200 leading-relaxed max-w-2xl mx-auto">
-                Погрузитесь в мир Minecraft с невиданной ранее красотой и реализмом.
-                Наши шейдеры преобразуют каждый пиксель!
-            </p>
-        </header>
+<body>
+    <!-- Navigation Bar -->
+    <nav id="mainNav" class="bg-white bg-opacity-90 backdrop-blur-sm p-4 z-50 shadow-md flex justify-between items-center">
+        <div class="flex justify-between items-center w-full px-4">
+            <a href="#" class="text-2xl font-bold gradient-text" data-key="siteTitle">Lumen Ascend Shaders</a>
+            <div class="flex items-center space-x-4">
+                <a href="#versions" class="text-gray-700 hover:text-gray-900 transition duration-300" data-key="navVersions">Versions</a>
+                <!-- Removed Contact Link -->
 
-        <!-- Основной контент -->
-        <main class="w-full flex flex-col items-center">
-            <!-- Секция версий шейдеров -->
-            <section class="w-full max-w-5xl mb-12 grid version-section-grid gap-8">
-                <!-- Карточка Light версии -->
-                <div class="glass-effect version-card text-center flex flex-col items-center justify-between">
-                    <div>
-                        <h2 class="text-4xl font-bold mb-4 text-white">Light Версия</h2>
-                        <p class="text-xl text-gray-200 mb-8 leading-relaxed">
-                            Оптимизирована для слабых ПК, обеспечивает улучшенную графику без значительной потери производительности.
-                        </p>
-                    </div>
-                    <a href="https://disk.yandex.kz/d/8oojo1Wy5e8pzQ" target="_blank" class="btn-base btn-glass">
-                        Скачать Light
-                        <!-- Иконка установки от Google Material Design -->
-                        <svg class="ml-4 -mr-1 w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                        </svg>
-                    </a>
-                </div>
-
-                <!-- Карточка Pro версии -->
-                <div class="glass-effect version-card text-center flex flex-col items-center justify-between">
-                    <div>
-                        <h2 class="text-4xl font-bold mb-4 text-white">Pro Версия</h2>
-                        <p class="text-xl text-gray-200 mb-8 leading-relaxed">
-                            Для средних и мощных ПК, предлагает максимальное качество графики и все новейшие эффекты.
-                        </p>
-                    </div>
-                    <a href="https://disk.yandex.kz/d/doEWuX9FwAURtA" target="_blank" class="btn-base btn-glass">
-                        Скачать Pro
-                        <!-- Иконка установки от Google Material Design -->
-                        <svg class="ml-4 -mr-1 w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                        </svg>
-                    </a>
-                </div>
-            </section>
-
-            <!-- Секция галереи изображений -->
-            <section class="glass-effect text-center p-8 w-full max-w-5xl mb-12">
-                <h2 class="text-4xl font-bold mb-8 text-white">Галерея Шейдеров</h2>
-                <div id="gallery-container" class="gallery-container">
-                    <!-- Карточки галереи -->
-                    <div class="gallery-card" style="background-image: url('https://ru-minecraft.ru/uploads/posts/2020-05/1588342045_1.jpg');">
-                        <div class="overlay">
-                            <span class="text-white text-2xl font-bold">Нажмите для следующего</span>
-                        </div>
-                    </div>
-                    <div class="gallery-card" style="background-image: url('https://images.wondershare.com/filmora/article-images/best-minecraft-shaders-seus.jpg');">
-                        <div class="overlay">
-                            <span class="text-white text-2xl font-bold">Нажмите для следующего</span>
-                        </div>
-                    </div>
-                    <div class="gallery-card" style="background-image: url('https://images.wondershare.com/filmora/article-images/best-minecraft-shaders-projectluma.png');">
-                        <div class="overlay">
-                            <span class="text-white text-2xl font-bold">Нажмите для следующего</span>
-                        </div>
+                <!-- Language Dropdown -->
+                <div class="relative dropdown">
+                    <button id="languageToggle" class="flex items-center text-gray-700 hover:text-gray-900 transition duration-300 p-2 rounded-full focus:outline-none">
+                        <span data-key="languageButtonText">Language</span>
+                    </button>
+                    <div id="languageDropdownContent" class="dropdown-content">
+                        <a href="#" class="lang-option" data-lang="en">🇬🇧 English</a>
+                        <a href="#" class="lang-option" data-lang="ru">🇷🇺 Русский</a>
+                        <a href="#" class="lang-option" data-lang="uk">🇺🇦 Українська</a>
+                        <a href="#" class="lang-option" data-lang="de">🇩🇪 Deutsch</a>
+                        <a href="#" class="lang-option" data-lang="fr">🇫🇷 Français</a>
+                        <a href="#" class="lang-option" data-lang="es-MX">🇲🇽 Español (México)</a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </div>
+    </nav>
 
-            <!-- Секция поддержки -->
-            <section class="glass-effect text-center p-8 w-full max-w-5xl mb-12">
-                <h2 class="text-4xl font-bold mb-8 text-white">Нужна Помощь?</h2>
-                <p class="text-xl text-gray-200 mb-8 leading-relaxed max-w-3xl mx-auto">
-                    Если у вас возникли вопросы или нужна поддержка, свяжитесь с нами в Telegram.
+    <!-- Main Content Wrapper (no longer needed as contact page is removed, but kept for structural clarity) -->
+    <div id="mainContentWrapper">
+        <!-- Hero Section -->
+        <section id="hero" class="relative h-screen flex items-center justify-center text-center bg-cover bg-center">
+            <div class="absolute inset-0 bg-white opacity-70"></div> <!-- Light translucent overlay -->
+            <div class="relative z-10 p-8 rounded-3xl max-w-4xl mx-auto bg-white bg-opacity-80 shadow-xl">
+                <h1 class="text-6xl md:text-7xl font-extrabold gradient-text leading-tight mb-6 animate-fade-in-down" data-key="heroTitle">
+                    Lumen Ascend Shaders
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-700 mb-8 animate-fade-in-down" style="animation-delay: 0.3s;" data-key="heroSubtitle">
+                    Transform your Minecraft world with incredible graphics and realism.
                 </p>
-                <a href="https://t.me/LolliTune" target="_blank" class="btn-base btn-glass">
-                    Поддержка Telegram
-                    <!-- Иконка Telegram удалена -->
+                <a href="#versions" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-full shadow-lg btn-glow animate-fade-in-up" data-key="heroButton">
+                    Choose Version
                 </a>
-            </section>
-        </main>
+            </div>
+        </section>
 
-        <!-- Секция футера -->
-        <footer class="text-center glass-effect footer-block">
-            <p class="text-sm text-gray-300 footer-text">&copy; 2025 Lumen Ascend. Все права защищены.</p>
+        <!-- About Us Section -->
+        <section id="about" class="py-20 bg-white rounded-3xl mx-4 my-8 shadow-xl scroll-reveal">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-5xl font-bold gradient-text mb-10" data-key="aboutTitle">About Lumen Ascend Shaders</h2>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed" data-key="aboutText">
+                    We create high-quality shaders that completely change the visual experience in Minecraft.
+                    Our goal is to bring stunning dynamic lighting, realistic water, and atmospheric effects to the game,
+                    allowing you to enjoy beauty without compromise.
+                </p>
+            </div>
+        </section>
+
+        <!-- Shader Versions Section -->
+        <section id="versions" class="py-20 bg-gray-100 rounded-3xl mx-4 my-8 shadow-xl scroll-reveal">
+            <div class="container mx-auto px-6">
+                <h2 class="text-5xl font-bold gradient-text text-center mb-12" data-key="versionsTitle">Our Shader Versions</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch"> <!-- Use items-stretch for equal height cards -->
+                    <!-- Lite Version -->
+                    <div class="bg-white p-8 rounded-3xl shadow-lg card-hover-effect border border-purple-400 flex flex-col">
+                        <div class="text-6xl mb-4 text-purple-500 text-center">✨</div>
+                        <h3 class="text-4xl font-semibold text-gray-900 mb-4 text-center" data-key="liteVersionTitle">Lite Version</h3>
+                        <p class="text-lg text-gray-700 mb-6 text-center flex-grow" data-key="liteVersionDesc">
+                            Perfect for players with less powerful systems.
+                            Provides improved lighting, soft shadows, and atmospheric effects
+                            without significant performance impact.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+                            <li data-key="liteFeature1">Optimized performance</li>
+                            <li data-key="liteFeature2">Basic dynamic lighting</li>
+                            <li data-key="liteFeature3">Improved clouds and sky</li>
+                            <li data-key="liteFeature4">Soft shadows</li>
+                        </ul>
+                        <div class="text-center mt-auto"> <!-- mt-auto pushes button to bottom -->
+                            <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-md btn-glow" data-key="downloadLite">
+                                Download Lite
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Pro Version -->
+                    <div class="bg-white p-8 rounded-3xl shadow-lg card-hover-effect border border-teal-400 flex flex-col pro-card-bg-animated">
+                        <div class="text-6xl mb-4 text-teal-500 text-center">💎</div>
+                        <h3 class="text-4xl font-semibold text-gray-900 mb-4 text-center" data-key="proVersionTitle">Pro Version</h3>
+                        <p class="text-lg text-gray-700 mb-6 text-center flex-grow" data-key="proVersionDesc">
+                            For those seeking maximum realism and visual splendor.
+                            Includes all advanced features for a complete immersion.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+                            <li data-key="proFeature1">Full dynamic lighting and global illumination</li>
+                            <li data-key="proFeature2">Advanced realistic water (waves, reflections, refractions)</li>
+                            <li data-key="proFeature3">Volumetric clouds and fog</li>
+                            <li data-key="proFeature4">Animated vegetation (grass, foliage)</li>
+                            <li data-key="proFeature5">Extended sky effects (sunsets, auroras)</li>
+                        </ul>
+                        <div class="text-center mt-auto"> <!-- mt-auto pushes button to bottom -->
+                            <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-md btn-glow" data-key="downloadPro">
+                                Download Pro
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-white bg-opacity-90 backdrop-blur-sm p-8 text-center rounded-t-3xl mx-4 mb-4 shadow-md">
+            <p class="text-gray-600" data-key="footerCopyright">&copy; 2025 Lumen Ascend Shaders. All rights reserved.</p>
+            <p class="text-gray-600" data-key="footerDisclaimer">The project is under development.</p>
         </footer>
-    </div>
+    </div> <!-- End of mainContentWrapper -->
+
+    <!-- Removed Contact Page Section -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const galleryContainer = document.getElementById('gallery-container');
-            let cards = Array.from(galleryContainer.querySelectorAll('.gallery-card'));
-
-            // Функция для обновления позиций карточек
-            function updateCardPositions() {
-                const totalCards = cards.length;
-                cards.forEach((card, index) => {
-                    const zIndex = totalCards - index;
-                    card.style.zIndex = zIndex;
-
-                    const translateY = index * 10;
-                    const scale = 1 - (index * 0.03);
-                    const rotation = index * 0.5;
-
-                    card.style.transition = 'transform 0.5s ease-in-out, z-index 0.5s ease-in-out';
-                    card.style.transform = `translateY(${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
-                    card.style.transformOrigin = 'center bottom';
-                });
+        // --- Language Translation Logic ---
+        const translations = {
+            en: {
+                siteTitle: "Lumen Ascend Shaders",
+                navVersions: "Versions",
+                // navContact: "Contact", // Removed
+                languageButtonText: "Language",
+                heroTitle: "Lumen Ascend Shaders",
+                heroSubtitle: "Transform your Minecraft world with incredible graphics and realism.",
+                heroButton: "Choose Version",
+                aboutTitle: "About Lumen Ascend Shaders",
+                aboutText: "We create high-quality shaders that completely change the visual experience in Minecraft. Our goal is to bring stunning dynamic lighting, realistic water, and atmospheric effects to the game, allowing you to enjoy beauty without compromise.",
+                versionsTitle: "Our Shader Versions",
+                liteVersionTitle: "Lite Version",
+                liteVersionDesc: "Perfect for players with less powerful systems. Provides improved lighting, soft shadows, and atmospheric effects without significant performance impact.",
+                liteFeature1: "Optimized performance",
+                liteFeature2: "Basic dynamic lighting",
+                liteFeature3: "Improved clouds and sky",
+                liteFeature4: "Soft shadows",
+                downloadLite: "Download Lite",
+                proVersionTitle: "Pro Version",
+                proVersionDesc: "For those seeking maximum realism and visual splendor. Includes all advanced features for a complete immersion.",
+                proFeature1: "Full dynamic lighting and global illumination",
+                proFeature2: "Advanced realistic water (waves, reflections, refractions)",
+                proFeature3: "Volumetric clouds and fog",
+                proFeature4: "Animated vegetation (grass, foliage)",
+                proFeature5: "Extended sky effects (sunsets, auroras)",
+                downloadPro: "Download Pro",
+                footerCopyright: "&copy; 2025 Lumen Ascend Shaders. All rights reserved.",
+                footerDisclaimer: "The project is under development.",
+                // contactName: "Lolli", // Removed
+                // contactDetails: "21 years old, 3+ years of experience" // Removed
+            },
+            ru: {
+                siteTitle: "Lumen Ascend Shaders",
+                navVersions: "Версии",
+                // navContact: "Контакты", // Removed
+                languageButtonText: "Язык",
+                heroTitle: "Lumen Ascend Shaders",
+                heroSubtitle: "Преобрази свой мир Minecraft с невероятной графикой и реализмом.",
+                heroButton: "Выбрать версию",
+                aboutTitle: "О Lumen Ascend Shaders",
+                aboutText: "Мы создаем высококачественные шейдеры, которые полностью меняют визуальный опыт в Minecraft. Наша цель — привнести в игру потрясающее динамическое освещение, реалистичную воду и атмосферные эффекты, позволяя тебе наслаждаться красотой без компромиссов.",
+                versionsTitle: "Наши Версии Шейдеров",
+                liteVersionTitle: "Лайт версия",
+                liteVersionDesc: "Идеально подходит для игроков с менее мощными системами. Обеспечивает улучшенное освещение, мягкие тени и атмосферные эффекты без значительной нагрузки на производительность.",
+                liteFeature1: "Оптимизированная производительность",
+                liteFeature2: "Базовое динамическое освещение",
+                liteFeature3: "Улучшенные облака и небо",
+                liteFeature4: "Мягкие тени",
+                downloadLite: "Скачать Лайт",
+                proVersionTitle: "Про версия",
+                proVersionDesc: "Для тех, кто ищет максимальный реализм и визуальное великолепие. Включает в себя все передовые функции для полного погружения.",
+                proFeature1: "Полное динамическое освещение и глобальное освещение",
+                proFeature2: "Продвинутая реалистичная вода (волны, отражения, преломления)",
+                proFeature3: "Объемные облака и туман",
+                proFeature4: "Анимированная растительность (трава, листва)",
+                proFeature5: "Расширенные эффекты неба (закаты, сияния)",
+                downloadPro: "Скачать Про",
+                footerCopyright: "&copy; 2025 Lumen Ascend Shaders. Все права защищены.",
+                footerDisclaimer: "Проект находится на стадии разработки.",
+                // contactName: "Lolli", // Removed
+                // contactDetails: "21 год, более 3х лет работы" // Removed
+            },
+            uk: {
+                siteTitle: "Lumen Ascend Shaders",
+                navVersions: "Версії",
+                // navContact: "Контакти", // Removed
+                languageButtonText: "Мова",
+                heroTitle: "Lumen Ascend Shaders",
+                heroSubtitle: "Перетворіть свій світ Minecraft за допомогою неймовірної графіки та реалізму.",
+                heroButton: "Вибрати версію",
+                aboutTitle: "Про Lumen Ascend Shaders",
+                aboutText: "Ми створюємо високоякісні шейдери, які повністю змінюють візуальний досвід у Minecraft. Наша мета — привнести в гру приголомшливе динамічне освітлення, реалістичну воду та атмосферні ефекти, дозволяючи вам насолоджуватися красою без компромісів.",
+                versionsTitle: "Наші Версії Шейдерів",
+                liteVersionTitle: "Лайт версія",
+                liteVersionDesc: "Ідеально підходить для гравців з менш потужними системами. Забезпечує покращене освітлення, м'які тіні та атмосферні ефекти без значної навантаження на продуктивність.",
+                liteFeature1: "Оптимізована продуктивність",
+                liteFeature2: "Базове динамічне освітлення",
+                liteFeature3: "Покращені хмари та небо",
+                liteFeature4: "М'які тіні",
+                downloadLite: "Завантажити Лайт",
+                proVersionTitle: "Про версія",
+                proVersionDesc: "Для тих, хто шукає максимальний реалізм та візуальну пишність. Включає всі розширені функції для повного занурення.",
+                proFeature1: "Повне динамічне освітлення та глобальне освітлення",
+                proFeature2: "Розширена реалістична вода (хвилі, відбиття, заломлення)",
+                proFeature3: "Об'ємні хмари та туман",
+                proFeature4: "Анімована рослинність (трава, листя)",
+                proFeature5: "Розширені ефекти неба (заходи, полярні сяйва)",
+                downloadPro: "Завантажити Про" ,
+                footerCopyright: "&copy; 2025 Lumen Ascend Shaders. Усі права захищені.",
+                footerDisclaimer: "Проект знаходиться на стадії розробки.",
+                // contactName: "Lolli", // Removed
+                // contactDetails: "21 рік, більше 3х років роботи" // Removed
+            },
+            de: {
+                siteTitle: "Lumen Ascend Shaders",
+                navVersions: "Versionen",
+                // navContact: "Kontakt", // Removed
+                languageButtonText: "Sprache",
+                heroTitle: "Lumen Ascend Shaders",
+                heroSubtitle: "Verwandeln Sie Ihre Minecraft-Welt mit unglaublicher Grafik und Realismus.",
+                heroButton: "Version wählen",
+                aboutTitle: "Über Lumen Ascend Shaders",
+                aboutText: "Wir erstellen hochwertige Shader, die das visuelle Erlebnis in Minecraft komplett verändern. Unser Ziel ist es, atemberaubende dynamische Beleuchtung, realistisches Wasser und atmosphärische Effekte ins Spiel zu bringen, damit Sie Schönheit ohne Kompromisse genießen können.",
+                versionsTitle: "Unsere Shader-Versionen",
+                liteVersionTitle: "Lite-Version",
+                liteVersionDesc: "Perfekt für Spieler mit weniger leistungsstarken Systemen. Bietet verbesserte Beleuchtung, weiche Schatten und atmosphärische Effekte ohne nennenswerte Leistungseinbußen.",
+                liteFeature1: "Optimierte Leistung",
+                liteFeature2: "Grundlegende dynamische Beleuchtung",
+                liteFeature3: "Verbesserte Wolken und Himmel",
+                liteFeature4: "Weiche Schatten",
+                downloadLite: "Lite herunterladen",
+                proVersionTitle: "Pro-Version",
+                proVersionDesc: "Für diejenigen, die maximalen Realismus und visuelle Pracht suchen. Enthält alle erweiterten Funktionen für ein vollständiges Eintauchen.",
+                proFeature1: "Volle dynamische Beleuchtung und globale Beleuchtung",
+                proFeature2: "Fortschrittliches realistisches Wasser (Wellen, Reflexionen, Brechungen)",
+                proFeature3: "Volumetrische Wolken und Nebel",
+                proFeature4: "Animierte Vegetation (Gras, Laub)",
+                proFeature5: "Erweiterte Himmel Effekte (Sonnenuntergänge, Polarlichter)",
+                downloadPro: "Pro herunterladen",
+                footerCopyright: "&copy; 2025 Lumen Ascend Shaders. Alle Rechte vorbehalten.",
+                footerDisclaimer: "Das Projekt befindet sich in der Entwicklung.",
+                // contactName: "Lolli", // Removed
+                // contactDetails: "21 Jahre alt, mehr als 3 Jahre Erfahrung" // Removed
+            },
+            fr: {
+                siteTitle: "Lumen Ascend Shaders",
+                navVersions: "Versions",
+                // navContact: "Contact", // Removed
+                languageButtonText: "Langue",
+                heroTitle: "Lumen Ascend Shaders",
+                heroSubtitle: "Transformez votre monde Minecraft avec des graphismes et un réalisme incroyables.",
+                heroButton: "Choisir la version",
+                aboutTitle: "À propos de Lumen Ascend Shaders",
+                aboutText: "Nous créons des shaders de haute qualité qui transforment complètement l'expérience visuelle dans Minecraft. Notre objectif est d'apporter un éclairage dynamique époustouflant, de l'eau réaliste et des effets atmosphériques au jeu, vous permettant de profiter de la beauté sans compromis.",
+                versionsTitle: "Nos versions de Shaders",
+                liteVersionTitle: "Version Lite",
+                liteVersionDesc: "Parfait pour les joueurs avec des systèmes moins puissants. Offre un éclairage amélioré, des ombres douces et des effets atmosphériques sans impact significatif sur les performances.",
+                liteFeature1: "Performances optimisées",
+                liteFeature2: "Éclairage dynamique de base",
+                liteFeature3: "Nuages et ciel améliorés",
+                liteFeature4: "Ombres douces",
+                downloadLite: "Télécharger Lite",
+                proVersionTitle: "Version Pro",
+                proVersionDesc: "Pour ceux qui recherchent un réalisme maximal et une splendeur visuelle. Comprend toutes les fonctionnalités avancées pour une immersion complète.",
+                proFeature1: "Éclairage dynamique complet et illumination globale",
+                proFeature2: "Eau réaliste avancée (vagues, reflets, réfractions)",
+                proFeature3: "Nuages volumétriques et brouillard",
+                proFeature4: "Végétation animée (herbe, feuillage)",
+                proFeature5: "Effets de ciel étendus (couchers de soleil, aurores)",
+                downloadPro: "Télécharger Pro",
+                footerCopyright: "&copy; 2025 Lumen Ascend Shaders. Tous droits réservés.",
+                footerDisclaimer: "Le projet est en développement.",
+                // contactName: "Lolli", // Removed
+                // contactDetails: "21 ans, plus de 3 ans d'expérience" // Removed
+            },
+            'es-MX': {
+                siteTitle: "Lumen Ascend Shaders",
+                navVersions: "Versiones",
+                // navContact: "Contacto", // Removed
+                languageButtonText: "Idioma",
+                heroTitle: "Lumen Ascend Shaders",
+                heroSubtitle: "Transforma tu mundo de Minecraft con gráficos y realismo increíbles.",
+                heroButton: "Elegir versión",
+                aboutTitle: "Acerca de Lumen Ascend Shaders",
+                aboutText: "Creamos shaders de alta calidad que cambian por completo la experiencia visual en Minecraft. Nuestro objetivo es traer iluminación dinámica impresionante, agua realista y efectos atmosféricos al juego, permitiéndote disfrutar de la belleza sin compromisos.",
+                versionsTitle: "Nuestras Versiones de Shaders",
+                liteVersionTitle: "Versión Lite",
+                liteVersionDesc: "Perfecta para jugadores con sistemas menos potentes. Proporciona iluminación mejorada, sombras suaves y efectos atmosféricos sin un impacto significativo en el rendimiento.",
+                liteFeature1: "Rendimiento optimizado",
+                liteFeature2: "Iluminación dinámica básica",
+                liteFeature3: "Nubes y cielo mejorados",
+                liteFeature4: "Sombras suaves",
+                downloadLite: "Descargar Lite",
+                proVersionTitle: "Versión Pro",
+                proVersionDesc: "Para aquellos que buscan el máximo realismo y esplendor visual. Incluye todas las características avanzadas para una inmersión completa.",
+                proFeature1: "Iluminación dinámica completa e iluminación global",
+                proFeature2: "Agua realista avanzada (ondas, reflejos, refracciones)",
+                proFeature3: "Nubes volumétricas y niebla",
+                proFeature4: "Vegetación animada (hierba, follaje)",
+                proFeature5: "Efectos de cielo extendidos (atardeceres, auroras)",
+                downloadPro: "Descargar Pro",
+                footerCopyright: "&copy; 2025 Lumen Ascend Shaders. Todos los derechos reservados.",
+                footerDisclaimer: "El proyecto está en desarrollo.",
+                // contactName: "Lolli", // Removed
+                // contactDetails: "21 años, más de 3 años de experiencia" // Removed
             }
+        };
 
-            // Добавляем слушатель кликов к каждой карточке
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    card.style.transition = 'transform 0.5s ease-in-out, opacity 0.5s ease-in-out';
-                    card.style.transform = `translateY(200px) scale(0.7) rotate(15deg)`;
-                    card.style.opacity = '0';
+        function setLanguage(lang) {
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+            document.documentElement.lang = lang; // Update HTML lang attribute
+        }
 
-                    setTimeout(() => {
-                        galleryContainer.removeChild(card);
-                        galleryContainer.appendChild(card);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Automatic language detection
+            const userLang = navigator.language || navigator.userLanguage; // Get browser language
+            let defaultLang = 'en'; // Fallback default
 
-                        cards = Array.from(galleryContainer.querySelectorAll('.gallery-card'));
+            // Check for specific language codes
+            if (userLang.startsWith('ru')) {
+                defaultLang = 'ru';
+            } else if (userLang.startsWith('uk')) {
+                defaultLang = 'uk';
+            } else if (userLang.startsWith('de')) {
+                defaultLang = 'de';
+            } else if (userLang.startsWith('fr')) {
+                defaultLang = 'fr';
+            } else if (userLang.startsWith('es')) { // Catch all Spanish variants, then refine for es-MX
+                defaultLang = 'es-MX'; // Prioritize es-MX if any Spanish is detected
+            } else if (userLang.startsWith('en')) {
+                defaultLang = 'en';
+            }
+            setLanguage(defaultLang);
 
-                        card.style.transition = 'none';
-                        card.style.opacity = '1';
-                        card.style.transform = '';
+            const languageToggle = document.getElementById('languageToggle');
+            const languageDropdownContent = document.getElementById('languageDropdownContent');
+            const mainNav = document.getElementById('mainNav');
+            // const contactLink = document.getElementById('contactLink'); // Removed
+            // const mainContentWrapper = document.getElementById('mainContentWrapper'); // Removed
+            // const contactPage = document.getElementById('contact-page'); // Removed
 
-                        updateCardPositions();
-                    }, 500);
+            // Set initial state for navbar
+            mainNav.classList.add('nav-initial');
+
+            // Toggle dropdown visibility on button click
+            languageToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click from bubbling up to document and closing immediately
+                languageDropdownContent.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (event) => {
+                if (!languageDropdownContent.contains(event.target) && !languageToggle.contains(event.target)) {
+                    languageDropdownContent.classList.remove('show');
+                }
+            });
+
+            // Set language when a language option is clicked
+            document.querySelectorAll('.lang-option').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const lang = event.target.getAttribute('data-lang');
+                    setLanguage(lang);
+                    languageDropdownContent.classList.remove('show'); // Close dropdown after selection
                 });
             });
 
-            // Начальная настройка позиций карточек
-            updateCardPositions();
+            // --- Navbar Scroll Animation Logic ---
+            const scrollThreshold = 50; // Pixels scrolled down to trigger animation
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > scrollThreshold) {
+                    mainNav.classList.remove('nav-initial');
+                    mainNav.classList.add('nav-scrolled');
+                } else {
+                    mainNav.classList.remove('nav-scrolled');
+                    mainNav.classList.add('nav-initial');
+                }
+            });
+
+            // --- Scroll Reveal Animation Logic ---
+            const scrollRevealElements = document.querySelectorAll('.scroll-reveal');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Stop observing once visible
+                    }
+                });
+            }, { threshold: 0.1 }); // Trigger when 10% of element is visible
+
+            scrollRevealElements.forEach(element => {
+                observer.observe(element);
+            });
+
+            // --- Removed Contact Page Toggle Logic ---
+            // The contactLink, mainContentWrapper, and contactPage elements are removed,
+            // so their related JavaScript logic is also removed.
         });
     </script>
 </body>
